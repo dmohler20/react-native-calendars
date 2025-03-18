@@ -107,15 +107,18 @@ class ReservationList extends Component<ReservationListProps, State> {
   }
 
   componentDidUpdate(prevProps: ReservationListProps) {
-    if (this.props.topDay && prevProps.topDay && prevProps !== this.props) {
-      if (!sameDate(prevProps.topDay, this.props.topDay)) {
-        this.setState({reservations: []},
-          () => this.updateReservations(this.props)
-        );
-      } else {
-        this.updateReservations(this.props);
-      }
+  if (this.props.topDay && prevProps.topDay) {
+    if (!sameDate(prevProps.topDay, this.props.topDay)) {
+      this.setState({reservations: []},
+        () => this.updateReservations(this.props)
+      );
+    } else if (
+      this.props.items !== prevProps.items || 
+      !sameDate(this.props.selectedDay, prevProps.selectedDay)
+    ) {
+      this.updateReservations(this.props);
     }
+  }
   }
 
   updateDataSource(reservations: DayAgenda[]) {
@@ -228,7 +231,9 @@ class ReservationList extends Component<ReservationListProps, State> {
     if (day) {
       if (!sameDate(day, this.selectedDay) && this.scrollOver) {
         this.selectedDay = day.clone();
-        this.props.onDayChange?.(day.clone());
+        if (this.props.onDayChange) {
+          this.props.onDayChange(day.clone());
+        }
       }
     }
   };

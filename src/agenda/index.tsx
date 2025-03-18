@@ -322,12 +322,17 @@ export default class Agenda extends Component<AgendaProps, State> {
   };
 
   onDayChange = (day: XDate) => {
+  if (!sameDate(day, this.state.selectedDay)) {
     const withAnimation = sameMonth(day, this.state.selectedDay);
-    this.calendar?.current?.scrollToDay(day, this.calendarOffset(), withAnimation);
-
-    this.setState({selectedDay: day});
-
-    this.props.onDayChange?.(xdateToData(day));
+    
+    this.setState({selectedDay: day}, () => {
+      this.calendar?.current?.scrollToDay(day, this.calendarOffset(), withAnimation);
+    
+      if (this.props.onDayChange) {
+        this.props.onDayChange(xdateToData(day));
+      }
+    });
+  }
   };
 
   renderReservations() {
